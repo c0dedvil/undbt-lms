@@ -23,6 +23,13 @@ class user {
 
     // user authorized
     function is_authorized() {
+        
+        # check if is an active account
+        if ($_SESSION['authorized'] && ! $_SESSION['active_account']) {
+            $_SESSION['authorized'] = false;
+            unset($_SESSION['username']);
+        }
+        
         return $_SESSION['authorized'];
     }
 
@@ -30,7 +37,7 @@ class user {
     function mysql_bind() {
         $username = $_POST['username'];
         $password = $_POST['password'];
-        $query = sprintf("SELECT * FROM auth_users " .
+        $query = sprintf("SELECT * FROM lms_users " .
                          "WHERE username = %s AND password = MD5( %s )",
                          $this->quote_smart( $username),
                          $this->quote_smart( $password) );        
@@ -42,12 +49,15 @@ class user {
             $_SESSION['authorized'] = true;
             $_SESSION['loggedout'] = false;
             $_SESSION['idusuario']   = $user_data['id'];
-            $_SESSION['username']   = $username;
+            $_SESSION['username']   = $user_data['username'];
             $_SESSION['nivel'] = $user_data['nivel'];
             $_SESSION['area'] = $user_data['area'];
+            
+            $this->username = $user_data['username'];
+            $this->pwd_md5 = $user_data['password'];
 
             // check whether user account is activated
-            if( ! isset( $user_data['activation_hash'] ) ) {
+            if( isset( $user_data['activation_hash'] ) ) {
                 $_SESSION['active_account'] = false; // exists hash activation. disabled account
             } else {
                 $_SESSION['active_account'] = true;  // there's no activation hash. It's an active account
@@ -58,88 +68,115 @@ class user {
             $_SESSION['authorized'] = false;
         }
     }
-
-    // create new user account
-    function user_create($username,$email,$password) {
-
-        if( $this->is_username_available($username) == false ) {
+    
+    # check if an user is active
+    function check_if_active() {
+    
+        $sql = sprintf("SELECT * FROM lms_users " .
+                "WHERE username = %s AND password = MD5( %s )",
+                $this->quote_smart( $username),
+                $this->quote_smart( $password) );        
+        
+        $rst = mysql_query($sql);
+        $ud = mysql_fetch_assoc($rst);
+        
+        // check whether user account is activated
+        if( ! isset( $ud['activation_hash'] ) ) {
+            # $_SESSION['active_account'] = false; // exists hash activation. disabled account
+            return true;
+        } else {
+            # $_SESSION['active_account'] = true;  // there's no activation hash. It's an active account
             return false;
         }
 
+    }
+
+    // create new user account
+    function user_create($username,$email,$password,$nivel,$area) {
+
+        /*
+        if( $this->is_username_available($username) == false ) {
+            return false;
+        }
+        */
+       
         // create an activation hash
         $activation_hash = md5( $username . $password . time() );
+        
+        $this->username = $username;
+        $this->email = $email;
+        $this->password = $password;
+        $this->activation_hash = $activation_hash;
 
 		// add username, password, email and activation hash to users table
-        $query = sprintf("INSERT INTO auth_users (username,password,email,activation_hash) " .
+        $query = sprintf("INSERT INTO lms_users (username,password,email,activation_hash,nivel,area) " .
                          "VALUES ( %s, MD5( %s ), %s, %s )",
-                         $this->quote_smart( $username ),
-                         $this->quote_smart( $password ),
-                         $this->quote_smart( $email ),
-                         $this->quote_smart( $activation_hash ) );
+                         $this->quote_smart( $this->username ),
+                         $this->quote_smart( $this->password ),
+                         $this->quote_smart( $this->email ),
+                         $this->quote_smart( $this->activation_hash ) );
+        
         mysql_query( $query );
+        echo "<p>USER INSERT SQL: ".$query;
 
-        $this->user_activation_message( $username );
+        # $this->user_activation_message( $username );
 
         return true;
     }
 
     function user_activation_message($username) {
-
-        // get activation hash of this user account
-        $query = sprintf("SELECT activation_hash, email FROM auth_users WHERE username = %s ",
-                         $this->quote_smart( $username ) );
-        $result = mysql_query( $query );
-        $user_data = mysql_fetch_assoc( $result );
-
+    
         // send a message to the user's email account with a verification link
-		$subject = 'Activacion de cuenta en el LIMS de Antek para ' . $username;
+		$subject = 'LIMS user activation for user ' . $username;
    
         // header of verification email
-        $header  = 'From: activacionlims@anteksa.com' . "\r\n" .
-                   'Reply-To: danielvilla@anteksa.com' . "\r\n" .
+        $header  = 'From: noreply@undbtlims.com' . "\r\n" .
+                   'Reply-To: lims@undbtlims.com' . "\r\n" .
                    'X-Mailer: PHP/' . phpversion();
    
         // verification email body
         $verification_message =
-        "{$username},\n\n" .
-		"Por favor visite el link a continuacion para activar su cuenta.\n\n" .
-        "http://lims.antek.ath.cx/?activation_code=" . $user_data['activation_hash'] . "\n";
+        "$this->username,\n\n" .
+		"Please visit the following link to activate your user account.\n\n" .
+        "http://localhost/nlims/users/activate.php?activation_code=" . $this->activation_hash . "\n";
    
         // send the message
-        mail( $user_data['email'], $subject, $verification_message, $header );
+        mail( $this->email, $subject, $verification_message, $header );
+                
     }
 
-    // activate a blocked user account
+    # activate a blocked user account
     function user_activation($activation_hash) {
-        // check whether the activation hash is valid
-        $query = sprintf("SELECT username FROM auth_users WHERE activation_hash= %s",
+    
+        # check whether the activation hash is valid
+        $sql = sprintf("SELECT username FROM lms_users WHERE activation_hash= %s",
                          $this->quote_smart($activation_hash) );
-        $result = mysql_query( $query );
+        $rst = mysql_query($sql);
 
-        // finish if the activation hash is not valid
-        if( mysql_num_rows( $result ) != 1 ) {
+        # finish if the activation hash is not valid
+        if( mysql_num_rows($rst) != 1 ) {
             return false;
         }
 
-		// remove the activation hash from the table if is valid
-        $user_data = mysql_fetch_assoc( $result );
-        $query = sprintf("UPDATE auth_users SET activation_hash=NULL WHERE activation_hash = %s",
-                         $this->quote_smart( $activation_hash ) );
-        mysql_query( $query );
-        // get the username previously associated with this activation hash, return it
-        return $user_data['username'];
+		# remove the activation hash from the table if is valid
+        $ud = mysql_fetch_assoc($rst);
+        $sql = sprintf("UPDATE lms_users SET activation_hash=NULL WHERE activation_hash = %s",
+                         $this->quote_smart($activation_hash));
+        mysql_query($sql);
+        # get the username previously associated with this activation hash, return it
+        return $ud['username'];
     }
 
     // change user password
     function user_password_change($username,$password_old,$password_new) {
-        $query = sprintf("SELECT username FROM auth_users WHERE username = %s AND password = MD5( %s )",
+        $query = sprintf("SELECT username FROM lms_users WHERE username = %s AND password = MD5( %s )",
                          $this->quote_smart( $username ),
                          $this->quote_smart( $password_old) );
         $result = mysql_query( $query );
         if( mysql_num_rows( $result ) != 1 ) {
             return false;
         }
-        $query = sprintf("UPDATE auth_users SET password = MD5( %s ) WHERE username = %s",
+        $query = sprintf("UPDATE lms_users SET password = MD5( %s ) WHERE username = %s",
                          $this->quote_smart( $password_new ),
                          $this->quote_smart( $username ) );
         mysql_query( $query );
@@ -147,18 +184,25 @@ class user {
    
     // finish current session
     function user_logout() {
+        
         $_SESSION['authorized'] = false;
+        
+        # free all session variables
+        session_unset();
+        
+        /*
         $_SESSION['nivel'] = null;
         $_SESSION['username'] = null;
         $_SESSION['loggedout'] = true;
+        */
     }
 
     // is the requested user available?
-    function is_username_available( $username ) {
-        if( $username == '' ) {
+    function is_username_available($username) {
+        if(empty($username)) {
             return false;
         }
-        $query = sprintf("SELECT username FROM auth_users WHERE username=%s", $this->quote_smart( $username ) );
+        $query = sprintf("SELECT username FROM lms_users WHERE username=%s", $this->quote_smart( $username ) );
         $result = mysql_query( $query );
         if( mysql_num_rows( $result ) == 0 ) {
             return true;

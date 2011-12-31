@@ -1,7 +1,7 @@
 <?php
 
 /**
-*  footer2.php 
+*  footer2.inc
 * 
 *  Generic footer for default pages
 * 

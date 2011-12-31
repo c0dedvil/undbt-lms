@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="utf-8">
+   <title>jQuery demo</title>
+ </head>
+ <body>
+   <a href="http://jquery.com/">jQuery</a>
+   <script src="./js/jquery.js"></script>
+   <script>
+    $("a").click(function(event){
+        event.preventDefault();
+        $(this).hide("slow");
+    });
+   </script>
+ </body>
+ </html>

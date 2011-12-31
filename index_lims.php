@@ -10,18 +10,11 @@
 */
 
 session_start();
-require('./lib/conexionbd.lib.php');
+
 require_once('./classes/user.php');
+require('./include/header.php');
 
 if ( $user->is_authorized() == true) {
-
-	require('./include/header.php');
-	
-	/*
-	echo "<p>NIVEL : ".$_SESSION['nivel']."<p>\n";
-	echo "<p>AREA : ".$_SESSION['area']."<p>\n";
-	echo "<p>USUARIO : ".$_SESSION['username']."<p>\n";
-	*/
 	
 	echo "<h2>MAIN MENU</h2>\n
 	<table width='400' border='0'>\n";
@@ -44,13 +37,20 @@ if ( $user->is_authorized() == true) {
 	}
 	
 	echo "<tr><td><a href='index_formato.php'>LAB REPORTS</a></td></tr>\n";
-	echo "</table><p>&nbsp;</p>\n";
-	//echo "<p>Bienvenido ".$_SESSION['usuario'];
+	
+	# --- ADMIN MENU ---
+	if ($_SESSION['nivel'] == 1) {
+	    echo "<tr><td>&nbsp;</td></tr><tr><td><hr size='0' noshade='noshade' /></td></tr><tr><td>&nbsp;</td></tr>\n";
+	    echo "<tr><td class='adm_title'>ADMIN MENU</td></tr>\n";
+	    echo "<tr><td><a clas='link_adm' href='./users/register_new_user.php'>REGISTER A NEW USER</a></td></tr>\n";
+	}	
+	# --- END ADMIN MENU ---
+	
+	echo "</table><p>&nbsp;\n";
+	
 	require('./include/footer.php');
 } else {
 	require('index.php');
 }
-
-mysql_close($conn);
 
 ?>

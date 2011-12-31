@@ -10,15 +10,22 @@
 */
 
 session_start();
-require('./lib/conexionbd.lib.php');
-require('./classes/user.php');
 
-if ( $user->is_authorized() == true) {
-    # OK. access granted
+# db connection
+require_once('./classes/db.php');
+$odb->connect();
+
+require_once('./classes/user.php');
+
+if ($user->is_authorized()) {
+    # echo "<p>OK. access granted";
     require('index_lims.php');
 } else {
-    # login error.
+    # echo "<p>login error";
     require('login.php');
 }
+
+# close database
+$odb->close();
 
 ?>

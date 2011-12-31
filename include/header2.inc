@@ -1,7 +1,7 @@
 <?php
 
 /**
-*  header2.php 
+*  header2.inc 
 * 
 *  generic header por default pages
 * 
@@ -11,6 +11,7 @@
 
 echo "<head><title>LIMS << LABORATORY INFORMATION MANAGEMENT SYSTEM >> - [[ DEMO ]]</title>\n";
 echo "<link href='../css/css01.css' rel='stylesheet' type='text/css' /></head>\n";
+echo "<script src='../js/jquery.js'></script>\n";
 echo "<table width='100%' border='0'>\n
       <tr><td width='40%'>";
 

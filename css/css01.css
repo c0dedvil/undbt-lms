@@ -84,3 +84,26 @@ textarea {
 .input_error {
 	background-color: #FF6A6A;
 }
+.link_adm {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: x-small;
+	color: #A3C350;
+}
+.adm_title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: large;
+	font-weight: bold;
+	color: #344294;
+}
+.txt02 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: medium;
+	font-weight: normal;
+	color: #3366CC;
+}
+.link02 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: medium;
+	font-weight: normal;
+	color: #9AB3E6;
+}

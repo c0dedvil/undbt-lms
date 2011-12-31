@@ -1,0 +1,65 @@
+<html>
+	<head>
+		<style type="text/css">
+			.category {
+				display: none;
+			}
+		</style>
+		<script type="text/javascript">
+			//add a "contains" function to Array
+			Array.prototype.contains = function(obj) {
+				var i = this.length;
+				while(i--) {
+					if(this[i] == obj)
+						return true;
+				}
+				return false; //no in array
+			}
+
+			function showhide(category) {
+				var check = new Array('food','drink');
+				
+				if(!check.contains(category)) {
+					return -1; //invalid category
+				}
+				
+
+				var div = document.getElementById(category);
+				var checkbox = document.getElementById(category + 'cb');
+
+				if(!(div && checkbox))
+					return -1; //one of req elements missing
+				
+				if(checkbox.checked) {
+					div.style.display = "block";
+				}
+				else {
+					div.style.display = "none";
+				}
+				
+				return 0; //success
+			}
+		</script>
+	</head>
+	<body>
+		<form>
+			<label for="foodcb">Food</label> <input id="foodcb" type="checkbox" onchange="showhide('food');">
+			<label for="drinkcb">Drink</label> <input id="drinkcb" type="checkbox" onchange="showhide('drink');">
+		</form>
+		<div id="food" class="category">
+			Food is yummy!
+		</div>
+		<div id="drink" class="category">
+			Drink is essential.
+		</div>
+
+                <script type="text/javascript">
+                <!-- //Hide from impaired browsers
+                    //call the showhides here in case page refreshed
+                    //and boxes checked on load
+                    showhide('food');
+                    showhide('drink');
+                //end hide ->
+                </script>
+	</body>
+</html>

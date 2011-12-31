@@ -9,25 +9,25 @@
 * 
 */
 
-require('./include/header.php');
 session_start();
+
+require('./include/header.inc');
 
 if ($_GET['exit'] == true) {
     echo "<p class='logout'>Logged out. ".$_SESSION['authorized']."\n";
 }
 
-/*
-# logged out
-if ($_SESSION['loggedout'] == true) {
-    echo "<p class='logout'>Logged out. ".$_SESSION['authorized']."\n";
-    $_SESSION['loggedout'] = false;
-}
-*/
-
 # invalid user and/or password
-if (isset($_POST['password']) && $_SESSION['authorized'] == false) {
-    echo "<p class='redalert'>Login error. Enter a valid user and password.</p>\n";
-}
+if (isset($_POST['password'])) {
+    if (!$_SESSION['authorized']) {
+        if (!$_SESSION['active_account']) {
+            echo "<p class='redalert'>Disabled account. Activate it using the link sent to your e-mail</p>\n";
+            echo "<p class= 'txt02'>If have the activation code, enter <a class='link02' href='./users/activate.php'>here.</a></p>\n";
+        } else {
+            echo "<p class='redalert'>Login error. Enter a valid user and password.</p>\n";
+        } # active_account
+    } # authorized
+} # post
 
 ?>
 
@@ -52,4 +52,4 @@ if (isset($_POST['password']) && $_SESSION['authorized'] == false) {
 </table>
 </form>
 
-<?php require('./include/footer.php'); ?>
+<?php require('./include/footer.inc'); ?>
