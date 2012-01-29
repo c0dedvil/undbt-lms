@@ -21,7 +21,7 @@ class db {
     
     # connect to database
     function connect() {
-        $this->conn = mysql_connect($this->host, $this->user, $this->pwd)
+        $this->conn = mysql_pconnect($this->host, $this->user, $this->pwd)
             or die("$strErrConexion");
         # select database
 	    mysql_select_db($this->bd);

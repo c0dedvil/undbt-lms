@@ -25,7 +25,7 @@ require_once('../include/header2.inc');
 	    $odb->connect();
 	    
 	    if ($user->is_username_available($_POST['username'])) {
-	        if ($user->user_create($_POST['username'],$_POST['email'],$_POST['pwd'])) { 
+	        if ($user->user_create($_POST['username'],$_POST['email'],$_POST['pwd'],$_POST['nivel'],$_POST['area'])) { 
        	        echo "<p class='logout'>User [".$_POST['username']."] has been created.";
        	    } else {
        	        echo "<p class='redalert'>Error. Unable to create user [".$_POST['username']."].";
@@ -58,19 +58,17 @@ require_once('../include/header2.inc');
       <td align="right"><b>NIVEL :</b></div></td>
       <td>
         <select name="nivel" id="nivel">
-          <option value="1">Administrador</option>
+          <option value="1">Administrator</option>
           <option value="2">Supervisor</option>
-          <option value="3">Jefe Area</option>
-          <option value="4">Usuario normal</option>
+          <option value="3">Area Chief</option>
+          <option value="4" selected="selected">Normal User</option>
         </select>
       </td>
     </tr>
-    <!--
-    <div class="area">
-    <tr>
-      <td align="right"><b>AREA :</b></div></td>
+    <tr class="areasec">
+      <td align="right"><b>AREA :</b></td>
       <td>
-        <select name="area">
+        <select name="area" id="area">
           <option value="" selected="selected">Select area ...</option>
           <option value="fq">Fisicoquimico</option>
           <option value="aa">Absorcion Atomica</option>
@@ -79,11 +77,9 @@ require_once('../include/header2.inc');
         </select>
       </td>
     </tr>
-    </div>
-    -->
-	<tr>
+    <tr>
       <td>&nbsp;</td>
-	  <td><hr size=\"0\" noshade=\"noshade\" />
+	  <td><hr size="0" noshade="noshade" />
 	</tr>    
     <tr>
       <td>&nbsp;</td>

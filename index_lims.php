@@ -12,7 +12,7 @@
 session_start();
 
 require_once('./classes/user.php');
-require('./include/header.php');
+require('./include/header.inc');
 
 if ( $user->is_authorized() == true) {
 	
@@ -48,8 +48,16 @@ if ( $user->is_authorized() == true) {
 	
 	echo "</table><p>&nbsp;\n";
 	
-	require('./include/footer.php');
+	# log user event
+	include_once('./classes/userlog.php');
+	echo "<p>LOG_USER_ACT: ".LOG_USER_ACT;
+	$actlog = 'Logged in the system';
+	$userlog->reg_log($actlog, 0, 'login');
+		
+	require('./include/footer.inc');
+	
 } else {
+
 	require('index.php');
 }
 

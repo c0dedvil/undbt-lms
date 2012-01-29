@@ -13,8 +13,8 @@ session_start();
 
 require('./include/header.inc');
 
-if ($_GET['exit'] == true) {
-    echo "<p class='logout'>Logged out. ".$_SESSION['authorized']."\n";
+if($_SESSION['logout']) {
+    echo "<p class='logout'>Logged out. Bye.";
 }
 
 # invalid user and/or password

@@ -25,7 +25,4 @@ if ($user->is_authorized()) {
     require('login.php');
 }
 
-# close database
-$odb->close();
-
 ?>

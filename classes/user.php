@@ -17,7 +17,7 @@ class user {
         {   
             $this->mysql_bind(); }
         else if ( isset( $_GET['logout'] ) ) {
-            $this->user_logout();
+            $this->logout();
         }
     }
 
@@ -30,7 +30,9 @@ class user {
             unset($_SESSION['username']);
         }
         
-        return $_SESSION['authorized'];
+        $_SESSION['ipaddr'] = $_SERVER['REMOTE_ADDR'];
+        $_SESSION['logout'] = false;
+        return $_SESSION['authorized'];        
     }
 
     // bind mysql server
@@ -183,18 +185,14 @@ class user {
     }
    
     // finish current session
-    function user_logout() {
-        
-        $_SESSION['authorized'] = false;
+    function logout() {
         
         # free all session variables
         session_unset();
         
-        /*
-        $_SESSION['nivel'] = null;
-        $_SESSION['username'] = null;
-        $_SESSION['loggedout'] = true;
-        */
+        $_SESSION['authorized'] = false;
+        $_SESSION['logout'] = true;
+                
     }
 
     // is the requested user available?

@@ -15,7 +15,7 @@ echo "<script src='../js/jquery.js'></script>\n";
 echo "<table width='100%' border='0'>\n
       <tr><td width='40%'>";
 
-echo "<a href='../index.php'><img src='../img/logo.png' alt='LIMS :: UndBit.com [[ DEMO ]]' border='0'/></a>";
+echo "<a href='index.php'><img src='../img/logo.png' alt='LIMS :: UndBit.com [[ DEMO ]]' border='0'/></a>";
 
 echo "</td>\n
 <td width='30%'>&nbsp;</td><td width='30%' valign='top'><table width='100%' border='0'>\n
